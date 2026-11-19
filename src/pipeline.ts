@@ -241,6 +241,7 @@ export async function runAudit(cfg: AuditConfig, opts: RunOptions): Promise<{ re
       const defaultMode = cfg.contexts[0]?.figmaMode ?? "light";
       const resolveVar = makeVariableResolver(reference, defaultMode);
       const unresolved = new Set<string>();
+      const skipped = new Set<string>();
       findings.push(
         ...checkFigmaStates(cells, {
           sets,
@@ -251,6 +252,8 @@ export async function runAudit(cfg: AuditConfig, opts: RunOptions): Promise<{ re
           colorDeltaE: cfg.thresholds.colorDeltaE,
           px: cfg.thresholds.px,
           unresolved,
+          requestedStates: new Set(cfg.runtime.surfaces.flatMap((s) => s.states.map((st) => st.name))),
+          skipped,
           ...figmaGraphHelpers(refExtras),
         }),
         ...figmaSelfChecks(sets, resolveVar, defaultMode),
@@ -259,6 +262,7 @@ export async function runAudit(cfg: AuditConfig, opts: RunOptions): Promise<{ re
       const unmapped = sets.filter((s) => !mapped.has(s.name)).map((s) => s.name);
       const missing = cfg.figmaComponents.filter((m) => !sets.some((s) => s.name === m.figma)).map((m) => m.figma);
       notes.push(`C7: ${sets.length} Figma component sets, ${sets.reduce((n, s) => n + s.variants.length, 0)} variants, ${cfg.figmaComponents.length} mappings.`);
+      if (skipped.size) notes.push(`C7: ${skipped.size} variants not checked because their states were not part of this run: ${[...skipped].sort().join(", ")}.`);
       if (unmapped.length) notes.push(`C7: Figma sets with no product mapping (not checked): ${unmapped.join(", ")}.`);
       if (missing.length) notes.push(`C7: mapped sets missing from reference.components: ${missing.join(", ")}.`);
       if (unresolved.size) notes.push(`C7: no Figma value for ${[...unresolved].sort().join(", ")}; those were not compared. Capture that mode's variables or effect styles.`);

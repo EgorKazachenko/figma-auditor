@@ -296,6 +296,22 @@ describe("C7 check", () => {
     expect(unmapped.map((x) => x.title)).toEqual(expect.arrayContaining([expect.stringContaining("no captured state is mapped")]));
   });
 
+  it("skips variants whose state was not part of this run instead of calling them unreachable", () => {
+    const skipped = new Set<string>();
+    const f = checkFigmaStates([cell("default", light, [], lightTokens)], {
+      sets: [option],
+      mappings: [optionMapping],
+      contexts: [light],
+      resolveVar: makeVariableResolver(reference, "light"),
+      colorDeltaE: 2,
+      px: 1,
+      requestedStates: new Set(["default"]),
+      skipped,
+    });
+    expect(f.some((x) => x.title.includes('state "hover" was not captured'))).toBe(false);
+    expect([...skipped]).toEqual(["List Option / State=Hover"]);
+  });
+
   it("compares only the listed properties", () => {
     const m = node("menu", { "background-color": "rgb(255, 0, 0)", "border-top-left-radius": "4px", "box-shadow": "none" }, { x: 0, y: 0, width: 226, height: 300 });
     const mapping: ComponentMapping = { figma: "Menu", element: "[data-testid=menu]", properties: ["radius"], variants: { "Property 1=Default": { state: "open" } } };

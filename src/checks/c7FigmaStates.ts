@@ -41,6 +41,10 @@ export interface C7Options {
   px: number;
   /** Filled with "variable (mode)" for colours the reference has no value for; those are not compared. */
   unresolved?: Set<string>;
+  /** States this run set out to capture. A mapped state outside it (a quick run with --states) is skipped, not unreachable. */
+  requestedStates?: Set<string>;
+  /** Filled with "set / variant" for variants skipped because their state was not part of this run. */
+  skipped?: Set<string>;
   /** Exact value of a Figma variable (by id) in a mode, from a figma-rest graph; null when it cannot be resolved. */
   resolveVarId?: (id: string, mode: string) => string | null;
   /** CSS names exported by more than one Figma variable: code syntax → variable names. */
@@ -151,6 +155,10 @@ export function checkFigmaStates(cells: SnapshotCell[], opts: C7Options): Findin
         }
 
         const { state, nth = 0 } = target[1];
+        if (opts.requestedStates && !opts.requestedStates.has(state)) {
+          opts.skipped?.add(`${set.name} / ${variant.name}`);
+          continue;
+        }
         // Every viewport that captured this state is compared; identical findings merge by fingerprint.
         const stateCells = cells.filter((c) => c.state === state && c.context === ctx.name);
         const layer = (m.layer ? variant.layers.find((l) => l.path === m.layer) : variant.layers[0]) ?? variant.layers[0]!;
