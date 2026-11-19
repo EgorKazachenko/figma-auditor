@@ -40,7 +40,7 @@ How the comparison works:
 
 | Command | What it does |
 | --- | --- |
-| `run --config f [--checks all] [--runtime]` | Audit: report in `reports/<run>/` and `reports/latest/`. `--fail-on high` for CI, `--update-baseline` to accept the current layout |
+| `run --config f [--checks all] [--runtime]` | Audit: report in `reports/<run>/` and `reports/latest/`. `--fail-on high` for CI, `--update-baseline` to accept the current layout, `--states a,b` / `--viewports a` / `--headed` for a quick run or a demo |
 | `mr --config f --base origin/main` | What a merge request adds: audits merge base and head (`git archive`, the checkout is untouched), pairs findings that moved with their code, names the commit that wrote each new one |
 | `figma pull --config f` | Download Figma variables and the component sets listed under `reference.componentSources`, cached by file version |
 | `figma suggest --config f` | Propose mappings from Figma components to captured elements, with the state that shows each variant |

@@ -16,3 +16,4 @@ coverage
 /ci/gitlab/
 /ci/emulate-mr.sh
 /test/opera-chat.test.ts
+/demo.sh

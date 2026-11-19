@@ -22,6 +22,8 @@ describe("design-auditor CLI", () => {
     [["audit", "--config", "x.yaml"], "Unknown command: audit"],
     [["run", "--config", "x.yaml", "--checks", "c10"], "Unknown checks: c10. Use c1 to c9 or all."],
     [["run", "--wat"], "Unknown option: --wat"],
+    [["run", "--config", "design-auditor.example.yaml", "--states", "nope"], "--states: no state named nope in the config"],
+    [["run", "--config", "design-auditor.example.yaml", "--viewports", "nope"], "--viewports: none of nope is in runtime.viewports"],
   ])("explains bad input %j with exit code 2", (args, message) => {
     const r = run(args);
     expect(r.status).toBe(2);

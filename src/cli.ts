@@ -19,6 +19,9 @@ Options:
   --no-history        Do not read or update the local history file
   --fail-on <level>   Exit with code 1 when a new finding has this severity or higher (high | medium | low)
   --collect <css>     Override runtime.collectSelector, e.g. "body *" to check every visible element
+  --states a,b         Capture only these states (a quick run or a demo)
+  --viewports a,b      Capture only these runtime.viewports
+  --headed             Show the browser window while capturing
   -h, --help          Show this help
 
 Reports are written to <report.dir>/<run id>/ and mirrored to <report.dir>/latest/.
@@ -26,7 +29,7 @@ Reports are written to <report.dir>/<run id>/ and mirrored to <report.dir>/lates
 Other commands:${SUBCOMMAND_HELP}`;
 
 function parseArgs(argv: string[]) {
-  const args = { cmd: argv[0], config: "", checks: ["c1", "c2"] as CheckId[], runtime: false, blame: false, history: true, failOn: undefined as Severity | undefined, collect: undefined as string | undefined, updateBaseline: false, help: false };
+  const args = { cmd: argv[0], config: "", checks: ["c1", "c2"] as CheckId[], runtime: false, blame: false, history: true, failOn: undefined as Severity | undefined, collect: undefined as string | undefined, updateBaseline: false, help: false, states: undefined as string[] | undefined, viewports: undefined as string[] | undefined, headed: false };
   for (let i = 1; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--config") args.config = argv[++i] ?? "";
@@ -40,6 +43,9 @@ function parseArgs(argv: string[]) {
     else if (a === "--fail-on") args.failOn = argv[++i] as Severity;
     else if (a === "--collect") args.collect = argv[++i];
     else if (a === "--update-baseline") args.updateBaseline = true;
+    else if (a === "--states") args.states = (argv[++i] ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+    else if (a === "--viewports") args.viewports = (argv[++i] ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+    else if (a === "--headed") args.headed = true;
     else if (a === "-h" || a === "--help") args.help = true;
     else throw new ConfigError(`Unknown option: ${a}`);
   }
@@ -66,6 +72,23 @@ async function main() {
 
   const cfg = loadConfig(args.config);
   if (args.collect) cfg.runtime.collectSelector = args.collect;
+  // A quick run (a demo, a check of one screen) captures a subset of what the config lists.
+  if (args.states) {
+    const want = new Set(args.states);
+    for (const s of cfg.runtime.surfaces) s.states = s.states.filter((st) => want.has(st.name));
+    const found = cfg.runtime.surfaces.flatMap((s) => s.states.map((st) => st.name));
+    const missing = args.states.filter((n) => !found.includes(n));
+    if (missing.length) throw new ConfigError(`--states: no state named ${missing.join(", ")} in the config`);
+  }
+  if (args.viewports) {
+    const keep = cfg.runtime.viewports.filter((v) => args.viewports!.includes(v.name));
+    if (!keep.length) throw new ConfigError(`--viewports: none of ${args.viewports.join(", ")} is in runtime.viewports`);
+    cfg.runtime.viewports = keep;
+  }
+  if (args.headed) {
+    cfg.runtime.headless = false;
+    if (cfg.runtime.harness && !cfg.runtime.harness.command.includes("--headed")) cfg.runtime.harness.command = [...cfg.runtime.harness.command, "--headed"];
+  }
   const { report, paths } = await runAudit(cfg, { checks: args.checks, runtime: args.runtime, blame: args.blame, history: args.history, updateBaseline: args.updateBaseline });
   const s = report.summary;
   const quiet = [s.accepted ? `accepted ${s.accepted}` : "", s.suppressed ? `suppressed ${s.suppressed}` : ""].filter(Boolean).join(", ");
