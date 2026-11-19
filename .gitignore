@@ -1,0 +1,18 @@
+node_modules
+.design-auditor
+reports
+coverage
+.DS_Store
+
+# Product-specific data stays out of this public repository: configs, Figma captures, harness specs,
+# seeded-defect specs and accepted debt of internal products belong in that product's private repo.
+/design-auditor.*.yaml
+!/design-auditor.example.yaml
+/README.*.md
+/reference/
+/harness/
+/eval/
+/accepted/
+/ci/gitlab/
+/ci/emulate-mr.sh
+/test/opera-chat.test.ts

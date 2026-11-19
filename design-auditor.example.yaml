@@ -1,0 +1,48 @@
+# Example configuration: audits the small fixture product in test/fixtures so the tool runs out of the box.
+#   ./bin/design-auditor.mjs run --config design-auditor.example.yaml            # C1 + C2, no browser window
+# A real product gets its own file like this one; see docs/extending.md.
+project: example
+
+target:
+  repo: ${DESIGN_AUDITOR_TARGET:-test/fixtures/repo}
+  themeEntry: src/root/themes/themes.css      # follows its @import list
+  tailwindConfig: tailwind.config.ts          # source of the spacing scale
+  scan:
+    include: [src]
+    extensions: [.ts, .tsx, .css]
+    exclude: [src/tests, src/root/themes]
+
+# One context per theme: the <html> attributes and colour scheme that select it, and the Figma mode it matches.
+contexts:
+  - { name: light, html: { data-theme: opera, data-product: Neon }, colorScheme: light, figmaMode: light }
+  - { name: dark, html: { data-theme: opera-dark, data-product: Neon }, colorScheme: dark, figmaMode: dark }
+
+reference:
+  sources:
+    # Values per Figma mode, captured with the Figma MCP tool get_variable_defs. With FIGMA_TOKEN
+    # (Enterprise) use `type: figma-rest` with `files` and `modes` instead, or `type: dtcg` for W3C tokens.
+    - { type: figma-variable-defs, path: test/fixtures/figma/light.json }
+    - { type: figma-variable-defs, path: test/fixtures/figma/dark.json }
+
+scales:
+  spacing: { tailwindPrefix: aria- }
+  radius: [4, 8]
+
+thresholds:
+  colorDeltaE: 2
+  px: 1
+
+owners:
+  A: Design system team
+  B: Product team
+
+# Runtime capture (C3–C9) needs a page to open:
+# runtime:
+#   driver: launch                 # or harness: the product's own Playwright suite (examples/harness/)
+#   surfaces:
+#     - name: home
+#       url: "http://localhost:3000/"
+#       states: [{ name: default }]
+
+report: { dir: reports }
+history: { path: .design-auditor/history.json }

@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  /* Each block plants one layout defect, or a look-alike that must not be reported. */
+  body { margin: 0; font: 14px/20px sans-serif; }
+  section { margin: 0 0 16px; }
+
+  /* 1. Text collision: the second label is pulled up over the first. */
+  .overlap > div { width: 220px; }
+  .overlap > div + div { margin-top: -16px; }
+
+  /* 2. A non-overlay layer covers a button. */
+  .stack { position: relative; height: 40px; }
+  .cover { position: absolute; left: 0; top: 0; width: 300px; height: 40px; background: #eee; z-index: 2; }
+
+  /* 3. A tooltip is meant to cover content: not a defect. */
+  .tip { position: absolute; left: 0; top: 0; width: 300px; height: 40px; background: #333; color: #fff; z-index: 5; }
+
+  /* 4. Cut-off text: without an ellipsis (defect) and with one (intended). */
+  .clip, .ellipsis { width: 80px; white-space: nowrap; overflow: hidden; }
+  .ellipsis { text-overflow: ellipsis; }
+
+  /* 5. Text that runs out of its box. */
+  .spill { width: 80px; white-space: nowrap; }
+
+  /* 6. Half of a label hidden by its container; a carousel slide fully hidden is fine. */
+  .crop { height: 30px; overflow: hidden; }
+  .crop > div { padding-top: 20px; }
+  .carousel { width: 200px; overflow: hidden; white-space: nowrap; }
+  .carousel > div { display: inline-block; width: 200px; }
+
+  /* 7. Same look, different construction: padding vs child margin vs wrong padding. */
+  .opt { display: flex; width: 240px; background: #f0f0f0; }
+  .opt.pad { padding: 8px 12px; }
+  .opt.margin > span { margin: 8px 12px; }
+  .opt.wide { padding: 8px 16px; }
+
+  /* 8. Flex gaps: built from margins (10px, off the scale) and from gap (8px, on the scale). */
+  .chips { display: flex; }
+  .chips.margins > span + span { margin-left: 10px; }
+  .chips.gap { gap: 8px; }
+  .chips.margin8 > span + span { margin-left: 8px; }
+
+  /* 9. Something wider than the viewport. */
+  .wide-row { width: 1500px; height: 4px; }
+</style>
+</head>
+<body>
+  <section class="overlap">
+    <div data-testid="overlap-a">First label text</div>
+    <div data-testid="overlap-b">Second label text</div>
+  </section>
+
+  <section class="stack">
+    <button data-testid="covered-button">Buy now</button>
+    <div class="cover" data-testid="promo-cover"></div>
+  </section>
+
+  <section class="stack">
+    <span data-testid="under-tip">Label under a tooltip</span>
+    <div class="tip" role="tooltip" data-testid="tip">Tip</div>
+  </section>
+
+  <section>
+    <div class="clip" data-testid="clipped">A very long label that does not fit</div>
+    <div class="ellipsis" data-testid="ellipsis">A very long label that does not fit</div>
+  </section>
+
+  <section>
+    <div class="spill" data-testid="spilling">Another long label that spills out</div>
+  </section>
+
+  <section>
+    <div class="crop"><div><div data-testid="cropped">Half visible label</div></div></div>
+    <div class="carousel"><div data-testid="slide-1">Slide one</div><div data-testid="slide-2">Slide two</div></div>
+  </section>
+
+  <section>
+    <div class="opt pad" data-testid="model-option"><span>Option A</span></div>
+    <div class="opt margin" data-testid="model-option-margin"><span>Option B</span></div>
+    <div class="opt wide" data-testid="model-option-wide"><span>Option C</span></div>
+  </section>
+
+  <section>
+    <div class="chips margins" data-testid="chips-margins"><span>One</span><span>Two</span></div>
+    <div class="chips gap" data-testid="chips-gap"><span>One</span><span>Two</span></div>
+    <div class="chips margin8" data-testid="chips-margin8"><span>One</span><span>Two</span></div>
+  </section>
+
+  <div class="wide-row" data-testid="wide-row"></div>
+</body>
+</html>

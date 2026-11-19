@@ -1,0 +1,36 @@
+{
+  "name": "design-auditor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Finds where a web product drifts from its Design System by comparing resolved values with tokens.",
+  "type": "module",
+  "bin": {
+    "design-auditor": "./bin/design-auditor.mjs"
+  },
+  "scripts": {
+    "audit": "tsx src/cli.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.10.0",
+    "pixelmatch": "5.3.0",
+    "playwright-core": "1.57.0",
+    "pngjs": "7.0.0",
+    "postcss": "8.4.49",
+    "yaml": "2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.21",
+    "@types/pixelmatch": "5.2.6",
+    "@types/pngjs": "6.0.5",
+    "@vitest/coverage-v8": "3.2.4",
+    "tsx": "4.19.4",
+    "typescript": "5.8.3",
+    "vitest": "3.2.4"
+  }
+}

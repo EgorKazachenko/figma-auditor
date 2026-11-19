@@ -1,0 +1,14 @@
+html {
+  color-scheme: light dark;
+  --color-level-5: env(-neon-color-elevation-5, light-dark(#ffffff, #171a1c));
+  --color-text-02: env(-neon-color-text-02, light-dark(#464d53, #75808a));
+  --color-accent-60: #599de2;
+  --color-neutral-92-60: light-dark(#e9ebec99, #3f454a99);
+  --space-unit: 4px;
+}
+html[data-theme="opera-dark"] {
+  --color-only-dark: #222222;
+}
+@media (min-width: 9999px) {
+  html { --color-level-5: #000000; }
+}

@@ -1,0 +1,15 @@
+{
+  "source": { "fileKey": "FILEKEY123", "fileName": "Chat Sidepanel", "nodeId": "1:2", "mode": "light" },
+  "variables": {
+    "var(--color-level-5)": "#f7f7f8",
+    "var(--color-text-2)": "#464c53",
+    "var(--color-accent-60)": "#599de2",
+    "var(--color-neutral-92-60)": "#e9ebec99",
+    "var(--color-not-in-code)": "#123123",
+    "spacing_1": "2",
+    "spacing_3": "6",
+    "radius_3": "8",
+    "MacOS/Body/M": "Font(family: \"SF Pro\", style: Regular, size: 14, weight: 400, lineHeight: 100, letterSpacing: 0)",
+    "ElevationShadow/Light/E5": "Effect(type: DROP_SHADOW, color: #171A1C1F, offset: (0, 6), radius: 16, spread: 0)"
+  }
+}

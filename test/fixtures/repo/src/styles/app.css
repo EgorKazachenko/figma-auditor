@@ -1,0 +1,7 @@
+.card {
+  color: #ff00ff;
+  --card-local: #ffffff;
+  background: var(--card-local);
+  border-color: var(--color-missing-token);
+}
+/* a comment with #abcdef is ignored */

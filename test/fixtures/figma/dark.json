@@ -1,0 +1,8 @@
+{
+  "source": { "fileKey": "FILEKEY123", "fileName": "Chat Sidepanel", "nodeId": "1:3", "mode": "dark" },
+  "variables": {
+    "var(--color-level-5)": "#101213",
+    "var(--color-text-2)": "#9ca3ab",
+    "var(--color-accent-60)": "#599de2"
+  }
+}

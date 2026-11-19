@@ -1,0 +1,4 @@
+html[data-product="Neon"] {
+  /* Neon pins these to the Figma values because the browser values differ */
+  --color-model-selector-bg: light-dark(#f7f7f8, #101213);
+}

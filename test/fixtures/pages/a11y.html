@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>a11y fixture</title>
+<style>
+  body { margin: 0; font: 14px/20px sans-serif; background: #ffffff; color: #111111; }
+  section { position: relative; padding: 8px; height: 60px; }
+  button { font: inherit; border: 0; background: #ffffff; color: #111111; padding: 8px 12px; }
+  #good-focus:focus-visible { outline: 2px solid #1877d7; outline-offset: 2px; }
+  #no-focus, #no-focus:focus, #no-focus:focus-visible { outline: none; }
+  #weak-focus:focus-visible { outline: none; background: #f2f2f2; }
+  .tiny { width: 16px; height: 16px; padding: 0; background: #dddddd; }
+  #tiny-a { position: absolute; left: 8px; top: 8px; }
+  #tiny-b { position: absolute; left: 28px; top: 8px; }
+  #tiny-alone { position: absolute; left: 400px; top: 8px; }
+  #faint-field { border: 1px solid #e6e6e6; background: #ffffff; padding: 6px; }
+  #good-field { border: 1px solid #767676; background: #ffffff; padding: 6px; }
+  .icon-btn { width: 32px; height: 32px; padding: 4px; background: #ffffff; }
+  #listbox { outline: none; width: 200px; }
+  #listbox [role=option] { padding: 6px; background: #ffffff; }
+  #listbox [role=option].active { background: #f5f5f5; }
+  #covered { position: absolute; left: 8px; top: 8px; width: 120px; height: 32px; }
+  #cover { position: absolute; left: 0; top: 0; width: 200px; height: 60px; background: #eeeeee; z-index: 2; }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+  #lang { padding: 8px; }
+  #labelled-box:focus-visible + label { outline: 2px solid #1877d7; }
+</style>
+</head>
+<body>
+  <section><button id="good-focus" data-testid="good-focus">Good focus</button></section>
+  <section><button id="no-focus" data-testid="no-focus">No focus ring</button></section>
+  <section><button id="weak-focus" data-testid="weak-focus">Weak focus</button></section>
+  <section>
+    <button class="tiny" id="tiny-a" data-testid="tiny-a" aria-label="A"></button>
+    <button class="tiny" id="tiny-b" data-testid="tiny-b" aria-label="B"></button>
+    <button class="tiny" id="tiny-alone" data-testid="tiny-alone" aria-label="Alone"></button>
+  </section>
+  <section><p>Read the <a href="#x" id="inline-link" data-testid="inline-link">terms</a> before you continue.</p></section>
+  <section>
+    <input id="faint-field" data-testid="faint-field" placeholder="Faint field">
+    <input id="good-field" data-testid="good-field" placeholder="Good field">
+    <input type="checkbox" class="sr-only" data-testid="sr-only-box" aria-label="hidden">
+  </section>
+  <section>
+    <button class="icon-btn" data-testid="faint-icon" aria-label="Faint"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 12h16" stroke="#cccccc" stroke-width="2" fill="none"/></svg></button>
+    <button class="icon-btn" data-testid="good-icon" aria-label="Good"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 12h16" stroke="#555555" stroke-width="2" fill="none"/></svg></button>
+    <button class="icon-btn" data-testid="disabled-icon" aria-label="Off" disabled><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 12h16" stroke="#eeeeee" stroke-width="2" fill="none"/></svg></button>
+  </section>
+  <section>
+    <div id="listbox" role="listbox" tabindex="0" aria-activedescendant="opt-2" data-testid="listbox">
+      <div role="option" id="opt-1">One</div>
+      <div role="option" id="opt-2" class="active">Two</div>
+      <div role="option" id="opt-3">Three</div>
+    </div>
+  </section>
+  <section style="height: 100px"><button id="covered" data-testid="covered">Covered</button><div id="cover" data-testid="cover"></div></section>
+  <section>
+    <button tabindex="-1" data-testid="untabbable">Mouse only</button>
+    <div role="toolbar" aria-label="tools"><button tabindex="-1" data-testid="roving">In a toolbar</button></div>
+    <input type="checkbox" id="labelled-box" class="sr-only" data-testid="labelled-box"><label for="labelled-box" data-testid="labelled-box-label">Remember me</label>
+  </section>
+  <div id="lang" data-testid="lang"></div>
+  <script>
+    document.getElementById("lang").textContent = "lang=" + navigator.language + " width=" + innerWidth;
+  </script>
+</body>
+</html>

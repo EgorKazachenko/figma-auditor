@@ -1,0 +1,19 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+  body { margin: 0; font: 14px/20px sans-serif; }
+  header { height: 40px; background: #eee; }
+  .cta { margin: 20px 20px 20px 32px; padding: 8px 12px; display: inline-block; background: #1877d7; color: #fff; }
+  .cta i { font-style: normal; }
+  ul { margin: 0 20px; padding: 0; list-style: none; }
+  .clock { margin: 20px; }
+  @keyframes pulse { from { opacity: .2 } to { opacity: 1 } }
+  .pulse { animation: pulse .3s infinite alternate; width: 20px; height: 20px; background: #f00; margin: 0 20px; }
+</style></head>
+<body>
+  <header data-testid="header">Header</header>
+  <div class="cta" data-testid="cta"><i data-testid="cta-label">Buy</i></div>
+  <ul><li data-testid="item">One</li><li data-testid="item">Three</li><li data-testid="badge">New</li></ul>
+  <div class="clock" data-testid="clock"></div>
+  <div class="pulse" data-testid="pulse"></div>
+  <script>document.querySelector('[data-testid=clock]').textContent = String(Date.now());</script>
+</body></html>

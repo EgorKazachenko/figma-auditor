@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin: 0; font: 14px/20px sans-serif; background: #ffffff; color: #171a1c; }
+  .row { position: relative; height: 40px; margin: 4px 8px; }
+  .dark { background: #101213; }
+  .tint { background: rgba(255, 255, 255, 0.5); }
+  .faded { opacity: 0.4; }
+  .grad { background-image: linear-gradient(90deg, #000, #fff); }
+  .under { position: absolute; inset: 0; background: #000; }
+  .over { position: relative; color: #777; }
+  .wide { width: 300px; }
+  @media (max-width: 500px) { .narrow-only { color: #bbbbbb; } }
+  .scroller { height: 40px; overflow-y: auto; }
+  .scroller div { height: 40px; }
+</style>
+</head>
+<body>
+  <div class="row"><span data-testid="good">Readable body text</span></div>
+  <div class="row"><span data-testid="grey" style="color:#9ca3ab">Grey text on white</span></div>
+  <div class="row"><span data-testid="mid" style="color:#767676">Just enough grey</span></div>
+  <div class="row"><span data-testid="big" style="color:#949494; font-size:24px">Large grey heading</span></div>
+  <div class="row dark"><div class="tint"><span data-testid="tinted" style="color:#ffffff">White on half-white over black</span></div></div>
+  <div class="row faded"><span data-testid="faded">Faded by its parent</span></div>
+  <div class="row grad"><span data-testid="gradient" style="color:#fff">Over a gradient</span></div>
+  <div class="row"><div class="under"></div><span class="over" data-testid="over-sibling">Over a black sibling</span></div>
+  <div class="row"><button disabled data-testid="disabled" style="color:#cccccc; background:#fff; border:0">Disabled</button></div>
+  <div class="row"><span data-testid="responsive" class="narrow-only">Grey only when narrow</span></div>
+  <div class="row scroller"><div>Top line</div><div data-testid="scrolled-out" style="color:#eeeeee">Scrolled out text</div></div>
+  <div class="row"><span>Unmarked plain text</span></div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin: 0; font: 14px/20px sans-serif; }
+  section { position: relative; height: 140px; margin: 8px; }
+  .scroller { position: absolute; top: 0; left: 0; width: 200px; height: 60px; overflow-y: auto; z-index: 2; background: #fff; }
+  .scroller > div { height: 40px; }
+  .below { position: absolute; top: 60px; left: 0; width: 200px; height: 80px; z-index: 3; background: #eee; }
+  .upload { position: relative; width: 120px; height: 40px; }
+  .upload input { position: absolute; inset: 0; width: 120px; height: 40px; }
+  .upload label { position: absolute; inset: 0; display: block; background: #ddd; z-index: 1; }
+  .invisible { position: absolute; top: 0; left: 140px; width: 120px; height: 40px; opacity: 0; }
+  .cover { position: absolute; top: 0; left: 140px; width: 120px; height: 40px; z-index: 1; background: #ccc; }
+  .stranger { position: absolute; top: 50px; left: 0; width: 120px; height: 40px; }
+  .stranger-cover { position: absolute; top: 50px; left: 0; width: 120px; height: 40px; z-index: 1; background: #bbb; }
+</style>
+</head>
+<body>
+  <section>
+    <div class="scroller" data-testid="scroller">
+      <div data-testid="scroll-top">Top item</div>
+      <div data-testid="scroll-half">Half visible item</div>
+      <div data-testid="scroll-out">Scrolled out item</div>
+    </div>
+    <div class="below" data-testid="below-scroller">Text below the list</div>
+    <div id="_r_24_"><div class="generated-anchor">Under a generated id</div></div>
+    <div id="sidebar"><div class="stable-anchor">Under a real id</div></div>
+  </section>
+  <section>
+    <div class="upload">
+      <input type="file" id="upload" data-testid="upload-input">
+      <label for="upload" data-testid="upload-label">Add a file</label>
+    </div>
+    <button class="invisible" data-testid="invisible-button">Hidden</button>
+    <div class="cover" data-testid="invisible-cover">Cover</div>
+    <button class="stranger" data-testid="stranger-button">Click me</button>
+    <div class="stranger-cover" data-testid="stranger-cover"></div>
+  </section>
+</body>
+</html>

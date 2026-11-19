@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  /* Emulates the product inside the real browser: --color-text-02 resolves to the corrected value
+     (as if Opera's env() supplied it), --color-level-5 keeps the drifted one. */
+  html {
+    color-scheme: light dark;
+    --color-level-5: light-dark(#ffffff, #171a1c);
+    --color-text-02: light-dark(#464d53, #9ca3ab);
+    --color-accent-60: #599de2;
+    --color-neutral-92-60: light-dark(#e9ebec99, #3f454a99);
+    --color-model-selector-bg: light-dark(#f7f7f8, #101213);
+    --space-unit: 4px;
+  }
+  body { margin: 0; font: 14px/20px sans-serif; background: var(--color-level-5); color: var(--color-text-02); }
+  .ok { background: var(--color-model-selector-bg); padding: 8px; border-radius: 8px; }
+  .off-color { color: #ff00aa; padding: 10px 8px; }
+  .pill { border-radius: 999px; padding: 4px 12px; background: var(--color-accent-60); color: #ffffff; }
+  .bordered { border: 1px solid #00ff00; padding: 2px; }
+  .container { color: #0000ff; padding: 4px; }
+  .hidden { display: none; color: #ff0000; }
+</style>
+</head>
+<body>
+  <div data-ds-component="ModelSelector" class="ok">Model</div>
+  <div data-testid="title" class="off-color">Title</div>
+  <div data-testid="pill" class="pill">Pill</div>
+  <div data-testid="bordered" class="bordered"></div>
+  <div data-testid="container" class="container"><span>child text</span></div>
+  <div data-testid="hidden" class="hidden">Hidden</div>
+  <svg data-testid="illustration" width="40" height="20"><text data-testid="svg-text" x="0" y="15" fill="#000">Art</text></svg>
+  <div id="host"></div>
+  <script>
+    const root = document.getElementById("host").attachShadow({ mode: "open" });
+    root.innerHTML = '<div data-testid="in-shadow" style="background:#abcdef;padding:8px">Shadow</div>';
+  </script>
+</body>
+</html>
