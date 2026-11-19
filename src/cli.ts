@@ -22,6 +22,7 @@ Options:
   --states a,b         Capture only these states (a quick run or a demo)
   --viewports a,b      Capture only these runtime.viewports
   --headed             Show the browser window while capturing
+  --quiet              Print only the summary, not the progress of the run
   -h, --help          Show this help
 
 Reports are written to <report.dir>/<run id>/ and mirrored to <report.dir>/latest/.
@@ -29,7 +30,7 @@ Reports are written to <report.dir>/<run id>/ and mirrored to <report.dir>/lates
 Other commands:${SUBCOMMAND_HELP}`;
 
 function parseArgs(argv: string[]) {
-  const args = { cmd: argv[0], config: "", checks: ["c1", "c2"] as CheckId[], runtime: false, blame: false, history: true, failOn: undefined as Severity | undefined, collect: undefined as string | undefined, updateBaseline: false, help: false, states: undefined as string[] | undefined, viewports: undefined as string[] | undefined, headed: false };
+  const args = { cmd: argv[0], config: "", checks: ["c1", "c2"] as CheckId[], runtime: false, blame: false, history: true, failOn: undefined as Severity | undefined, collect: undefined as string | undefined, updateBaseline: false, help: false, quiet: false, states: undefined as string[] | undefined, viewports: undefined as string[] | undefined, headed: false };
   for (let i = 1; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--config") args.config = argv[++i] ?? "";
@@ -46,6 +47,7 @@ function parseArgs(argv: string[]) {
     else if (a === "--states") args.states = (argv[++i] ?? "").split(",").map((s) => s.trim()).filter(Boolean);
     else if (a === "--viewports") args.viewports = (argv[++i] ?? "").split(",").map((s) => s.trim()).filter(Boolean);
     else if (a === "--headed") args.headed = true;
+    else if (a === "--quiet") args.quiet = true;
     else if (a === "-h" || a === "--help") args.help = true;
     else throw new ConfigError(`Unknown option: ${a}`);
   }
@@ -88,6 +90,10 @@ async function main() {
   if (args.headed) {
     cfg.runtime.headless = false;
     if (cfg.runtime.harness && !cfg.runtime.harness.command.includes("--headed")) cfg.runtime.harness.command = [...cfg.runtime.harness.command, "--headed"];
+  }
+  if (!args.quiet) {
+    const { setProgress } = await import("./progress.js");
+    setProgress((line) => process.stderr.write(`${line}\n`));
   }
   const { report, paths } = await runAudit(cfg, { checks: args.checks, runtime: args.runtime, blame: args.blame, history: args.history, updateBaseline: args.updateBaseline });
   const s = report.summary;

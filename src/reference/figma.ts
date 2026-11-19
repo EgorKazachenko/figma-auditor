@@ -4,6 +4,7 @@ import type { ReferenceToken } from "../types.js";
 import { cssVarName } from "../names.js";
 import { toHex } from "../color.js";
 import { fromDtcg } from "./dtcg.js";
+import { progress } from "../progress.js";
 import { buildVariableGraph, toReferenceTokens, type ModeChoice, type VariableGraph } from "../figma/variables.js";
 import { cachedFigma, figmaClient } from "../figma/rest.js";
 
@@ -151,6 +152,7 @@ export async function loadReference(
       const loaded = [];
       for (const key of s.files ?? []) {
         const f = await cachedFigma(client, s.cacheDir!, key, "variables", `/v1/files/${key}/variables/local`, { refresh: opts.refresh });
+        progress(`Figma: ${f.name ?? key} (${f.from === "network" ? "downloaded" : "unchanged, from cache"})`);
         loaded.push({ fileKey: key, json: f.json, version: f.version, name: f.name });
       }
       const graph = buildVariableGraph(loaded);

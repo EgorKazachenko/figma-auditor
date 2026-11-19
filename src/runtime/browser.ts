@@ -4,6 +4,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { chromium, type BrowserContext, type Page } from "playwright-core";
 import { assertRuntimeReady, type AuditConfig } from "../config.js";
+import { progress } from "../progress.js";
 import { collectPlan } from "./collect.js";
 import type { Context, ResolvedTokens, SnapshotCell } from "../types.js";
 
@@ -289,9 +290,13 @@ export async function probeProduct(
                 page: pageInfo,
                 screenshot,
               });
+              progress(`  ✓ ${where} · ${(nodes as unknown[]).length} elements`);
               break;
             } catch (e) {
-              if (attempt === attempts) warnings.push(`${where}: ${(e as Error).message.split("\n")[0]}${attempts > 1 ? ` (after ${attempts} attempts)` : ""}`);
+              if (attempt === attempts) {
+                warnings.push(`${where}: ${(e as Error).message.split("\n")[0]}${attempts > 1 ? ` (after ${attempts} attempts)` : ""}`);
+                progress(`  ✗ ${where}: ${(e as Error).message.split("\n")[0]}`);
+              }
             } finally {
               await page.close();
             }

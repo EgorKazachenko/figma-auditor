@@ -23,6 +23,7 @@ import { applyHistory, cellId, loadHistory, saveHistory } from "./history.js";
 import { groupFindings } from "./triage.js";
 import { cellName, sortFindings } from "./findings.js";
 import { headCommit } from "./git.js";
+import { progress } from "./progress.js";
 import { writeReport } from "./report/render.js";
 import { applyAccepted, applySeverityOverrides, applySuppressions, isActive, loadAccepted } from "./noise.js";
 import { aggregateIssues, issueCounts, regroupByIssues } from "./issues.js";
@@ -102,6 +103,7 @@ export async function runAudit(cfg: AuditConfig, opts: RunOptions): Promise<{ re
   if (css.warnings.length) notes.push(...css.warnings);
   const tokenNames = [...new Set(css.decls.filter((d) => !d.selector.includes("@")).map((d) => d.name))];
   notes.push(`Theme CSS: ${css.files.length} files, ${tokenNames.length} custom properties.`);
+  progress(`Code: theme CSS from ${css.files.length} files, ${tokenNames.length} design variables`);
 
   const refWarnings: string[] = [];
   const refExtras: ReferenceExtras = { graphs: [] };
@@ -113,6 +115,7 @@ export async function runAudit(cfg: AuditConfig, opts: RunOptions): Promise<{ re
   if (reference.length) {
     const modes = [...new Set(reference.map((t) => t.mode))].join(", ");
     notes.push(`Reference: ${reference.length} Figma values from ${cfg.reference.sources.length} sources (modes: ${modes}).`);
+    progress(`Figma: ${reference.length} design values for ${modes}`);
   }
 
   const spacingScale = uniqSorted([
@@ -136,6 +139,7 @@ export async function runAudit(cfg: AuditConfig, opts: RunOptions): Promise<{ re
       blame: opts.blame,
     });
     notes.push(`Static scan: ${files} files, ${hits.length} hits.`);
+    progress(`Source code: scanned ${files} files, ${hits.length} hard-coded values or unknown variables`);
     notes.push(...scanWarnings.map((w) => `Static scan: ${w}`));
     findings.push(...checkStatic(hits as StaticHit[], { spacingScale, radiusScale, px: cfg.thresholds.px }));
   }
@@ -152,10 +156,12 @@ export async function runAudit(cfg: AuditConfig, opts: RunOptions): Promise<{ re
         }
         return probeProduct(cfg, names, outDir);
       });
+    progress(`Product: capturing with the ${cfg.runtime.driver} driver…`);
     const res = await probe(tokenNames, runDir);
     cells = res.cells;
     browser = res.browser;
     notes.push(`Runtime: ${cells.length} cells captured in ${res.browser}.`);
+    progress(`Product: ${cells.length} screens captured in ${res.browser}${res.warnings.length ? `, ${res.warnings.length} warnings (see the report's notes)` : ""}`);
     for (const c of cells) notes.push(`Runtime cell ${cellName(c)}: ${c.nodes.length} elements${c.texts ? `, ${c.texts.length} texts` : ""} collected.`);
     if (opts.write !== false) {
       mkdirSync(runDir, { recursive: true });
@@ -314,6 +320,12 @@ export async function runAudit(cfg: AuditConfig, opts: RunOptions): Promise<{ re
   findings = overridden.findings;
   for (const [k, n] of Object.entries(overridden.dropped)) notes.push(`Severity override: ${n} ${k} findings turned off in the config.`);
 
+  {
+    const byCheck = new Map<string, number>();
+    for (const f of findings) byCheck.set(f.check, (byCheck.get(f.check) ?? 0) + 1);
+    const ran = opts.checks.map((c) => c.toUpperCase());
+    progress(`Checks: ${ran.map((c) => `${c} ${byCheck.get(c) ?? 0}`).join(" · ")} findings`);
+  }
   const needsRuntime = (c: CheckId) => c !== "c1" && c !== "c2";
   const checksRan = opts.checks
     .filter((c) => !needsRuntime(c) || cells.length)
@@ -326,6 +338,7 @@ export async function runAudit(cfg: AuditConfig, opts: RunOptions): Promise<{ re
     const h = loadHistory(cfg.history.path);
     const applied = applyHistory(h, findings, { id: runId, at: now.toISOString(), commit, checks: checksRan, cells: cells.map(cellId) });
     fixed = applied.fixed;
+    progress(`History: ${findings.filter((f) => f.status === "new").length} new, ${findings.filter((f) => f.status === "open").length} still open, ${fixed.length} fixed since the last run`);
     if (opts.write !== false) saveHistory(cfg.history.path, applied.history);
   } else {
     for (const f of findings) f.status = "new";

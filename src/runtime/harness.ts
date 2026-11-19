@@ -4,6 +4,7 @@ import { join, resolve } from "node:path";
 import { ConfigError, type AuditConfig } from "../config.js";
 import type { SnapshotCell } from "../types.js";
 import { validateCell } from "../contract.js";
+import { progress, progressEnabled } from "../progress.js";
 import { collectPlan } from "./collect.js";
 
 /**
@@ -141,6 +142,40 @@ export async function runHarness(
 
   const [cmd, ...args] = harnessCommand(h.command, h.spec);
   const output: string[] = [];
+  const total = spec.contexts.length * (spec.viewports.length ? spec.viewports : [undefined]).reduce(
+    (n, v, i) => n + spec.states.filter((s) => i === 0 || !v?.states || v.states.includes(s.name)).length,
+    0,
+  );
+  progress(`Product: starting the product's test suite (${cmd} ${args.slice(0, 2).join(" ")}…), ${total} screens to capture`);
+  // Cells appear one by one in the output folder: report each as it lands.
+  const seen = new Set<string>();
+  const watch = progressEnabled()
+    ? setInterval(() => {
+        let files: string[] = [];
+        try {
+          files = readdirSync(outDir);
+        } catch {
+          return;
+        }
+        for (const f of files.sort()) {
+          if (seen.has(f) || !(f.endsWith(".cell.json") || f.endsWith(".error.txt"))) continue;
+          seen.add(f);
+          const name = f.replace(/\.(cell\.json|error\.txt)$/, "").split("__").join(" · ");
+          if (f.endsWith(".error.txt")) {
+            const why = readFileSync(join(outDir, f), "utf8").split("\n")[0];
+            progress(`  ✗ ${name}: ${why}`);
+          } else {
+            let n = "";
+            try {
+              n = ` · ${(JSON.parse(readFileSync(join(outDir, f), "utf8")).nodes ?? []).length} elements`;
+            } catch {
+              /* still being written */
+            }
+            progress(`  ✓ ${name}${n}  (${[...seen].filter((x) => x.endsWith(".cell.json")).length}/${total})`);
+          }
+        }
+      }, 400)
+    : undefined;
   const code = await new Promise<number | null>((done, fail) => {
     const child = spawn(cmd!, args, {
       cwd: h.cwd,
@@ -163,6 +198,7 @@ export async function runHarness(
       done(c);
     });
   });
+  if (watch) clearInterval(watch);
 
   const read = readCaptureDir(outDir, {
     states: spec.states.map((s) => s.name),
